@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-define('ZEZH_VERSION', '1.3.1');
+define('ZEZH_VERSION', '1.3.2');
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
@@ -65,12 +65,86 @@ add_action('wp_head', function () {
  */
 function zezh_reading_time($post_id = 0) {
     $post_id = $post_id ?: get_the_ID();
-    $content = get_post_field('post_content', $post_id);
-    $text    = wp_strip_all_tags($content);
-    // Считаем Unicode-слова (работает для кириллицы)
-    $words   = preg_match_all('/\p{L}+/u', $text, $m) ? count($m[0]) : 0;
-    $minutes = (int) max(1, ceil($words / 200));
-    return ['words' => $words, 'minutes' => $minutes];
+    $content = (string) get_post_field('post_content', $post_id);
+
+    if ($content === '') {
+        return [
+            'words'   => 0,
+            'min'     => 1,
+            'max'     => 1,
+            'images'  => 0,
+            'code'    => 0,
+        ];
+    }
+
+    $slow_wpm = 160;
+    $fast_wpm = 210;
+
+    // Код считаем отдельно и исключаем из обычного текста.
+    preg_match_all('/<pre\b[^>]*>(.*?)<\/pre>/isu', $content, $code_blocks);
+
+    $code_seconds = 0;
+
+    foreach ($code_blocks[1] as $code) {
+        $code = html_entity_decode(
+            wp_strip_all_tags($code),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8'
+        );
+
+        $lines = preg_split('/\R/u', trim($code));
+        $lines = array_filter(
+            $lines,
+            static fn($line) => trim($line) !== ''
+        );
+
+        $code_seconds += max(10, count($lines) * 2);
+    }
+
+    $text_content = preg_replace(
+        '#<(pre|script|style|noscript|svg)\b[^>]*>.*?</\1>#isu',
+        ' ',
+        $content
+    );
+
+    $text = html_entity_decode(
+        wp_strip_all_tags($text_content, true),
+        ENT_QUOTES | ENT_HTML5,
+        'UTF-8'
+    );
+
+    preg_match_all(
+        "/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/u",
+        $text,
+        $words_match
+    );
+
+    $words = count($words_match[0]);
+
+    // На первые изображения человек обычно тратит больше времени.
+    preg_match_all('/<img\b[^>]*>/i', $content, $images);
+    $image_count   = count($images[0]);
+    $image_seconds = 0;
+
+    for ($i = 0; $i < $image_count; $i++) {
+        $image_seconds += max(3, 12 - $i);
+    }
+
+    $extra_seconds = $code_seconds + $image_seconds;
+
+    $min_seconds = ($words / $fast_wpm) * 60 + $extra_seconds;
+    $max_seconds = ($words / $slow_wpm) * 60 + $extra_seconds;
+
+    $min_minutes = max(1, (int) ceil($min_seconds / 60));
+    $max_minutes = max($min_minutes, (int) ceil($max_seconds / 60));
+
+    return [
+        'words'   => $words,
+        'min'     => $min_minutes,
+        'max'     => $max_minutes,
+        'images'  => $image_count,
+        'code'    => count($code_blocks[0]),
+    ];
 }
 
 /**

@@ -13,7 +13,15 @@ while (have_posts()):
         </header>
         <div class="article-meta">
             <span><?php echo esc_html($reading['words']); ?> слов</span>
-            <span><?php echo esc_html($reading['minutes']); ?> мин. чтения</span>
+            <span>
+                <?php
+                echo esc_html(
+                    $reading['min'] === $reading['max']
+                        ? $reading['min']
+                        : $reading['min'] . '–' . $reading['max']
+                );
+                ?> мин. чтения
+            </span>
         </div><?php if (has_post_thumbnail()): ?>
             <div class="article-cover"><?php the_post_thumbnail('full'); ?></div><?php endif; ?>
         <div class="prose"><?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
