@@ -595,3 +595,50 @@ img {
 body.menu-open {
     overflow: hidden
 }
+
+/* --- Cookie notice --- */
+.cookie-notice {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    padding: 20px 0;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, .06)
+}
+
+.cookie-notice[hidden] {
+    display: none
+}
+
+.cookie-notice-inner {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap
+}
+
+.cookie-notice-inner p {
+    flex: 1;
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    min-width: 240px
+}
+
+.cookie-notice-inner a {
+    color: var(--accent);
+    text-decoration: underline;
+    font-weight: 500
+}
+
+.cookie-notice-ok {
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font: 600 15px "IBM Plex Sans", Arial, sans-serif
+}

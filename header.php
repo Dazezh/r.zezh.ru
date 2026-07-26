@@ -4,10 +4,14 @@
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="icon" type="image/x-icon" id="zezh-favicon-dark"
-        href="<?php echo esc_url(get_template_directory_uri() . '/assets/img/logo/favicon/favicon-black.ico'); ?>">
-    <link rel="icon" type="image/x-icon" id="zezh-favicon-light"
-        href="<?php echo esc_url(get_template_directory_uri() . '/assets/img/logo/favicon/favicon-white.ico'); ?>">
+    <link
+        rel="icon"
+        type="image/x-icon"
+        id="zezh-favicon"
+        href="<?php echo esc_url(get_template_directory_uri() . '/assets/img/logo/favicon/favicon-white.ico'); ?>"
+        data-active="<?php echo esc_url(get_template_directory_uri() . '/assets/img/logo/favicon/favicon-white.ico'); ?>"
+        data-hidden="<?php echo esc_url(get_template_directory_uri() . '/assets/img/logo/favicon/favicon-black.ico'); ?>"
+    >
     <script>try { document.documentElement.dataset.theme = localStorage.getItem('zezh-theme') || ((matchMedia('(prefers-color-scheme:dark)').matches) ? 'dark' : 'light') } catch (e) { }</script>
     <?php wp_head(); ?>
 </head>

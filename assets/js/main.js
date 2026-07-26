@@ -1,13 +1,13 @@
 (() => {
     const root = document.documentElement, toggle = document.querySelector('.theme-toggle');
-    const favLight = document.querySelector('#zezh-favicon-light');
-    const favDark = document.querySelector('#zezh-favicon-dark');
+    const favicon = document.getElementById('zezh-favicon');
 
     const syncFavicon = () => {
-        const hidden = document.visibilityState === 'hidden';
-        // Вкладка активна → белая иконка; неактивна → тёмная
-        if (favLight) favLight.disabled = hidden;
-        if (favDark) favDark.disabled = !hidden;
+        if (!favicon) return;
+
+        favicon.href = document.visibilityState === 'hidden'
+            ? favicon.dataset.hidden
+            : favicon.dataset.active;
     };
 
     const set = t => {
@@ -49,4 +49,16 @@
             if (body.classList.contains('menu-open')) closeMenu();
         });
     });
+
+    /* --- Cookie consent --- */
+    const cookieNotice = document.getElementById('cookie-notice');
+    const cookieOk = document.getElementById('cookie-notice-ok');
+
+    if (cookieNotice && cookieOk && !localStorage.getItem('zezh-cookie-ok')) {
+        cookieNotice.hidden = false;
+        cookieOk.addEventListener('click', () => {
+            cookieNotice.hidden = true;
+            try { localStorage.setItem('zezh-cookie-ok', '1') } catch (e) { }
+        });
+    }
 })();
