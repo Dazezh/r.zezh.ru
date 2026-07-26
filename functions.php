@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-define('ZEZH_VERSION', '1.2.1');
+define('ZEZH_VERSION', '1.3.1');
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
@@ -59,5 +59,82 @@ add_action('wp_head', function () {
     $schema=['@context'=>'https://schema.org','@type'=>is_singular('service')?'SoftwareApplication':'WebSite','name'=>wp_get_document_title(),'url'=>is_singular()?get_permalink():home_url('/'),'description'=>$desc];
     echo '<script type="application/ld+json">'.wp_json_encode($schema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).'</script>'."\n";
 }, 2);
+
+/**
+ * Подсчёт количества слов и времени чтения для статьи.
+ */
+function zezh_reading_time($post_id = 0) {
+    $post_id = $post_id ?: get_the_ID();
+    $content = get_post_field('post_content', $post_id);
+    $text    = wp_strip_all_tags($content);
+    // Считаем Unicode-слова (работает для кириллицы)
+    $words   = preg_match_all('/\p{L}+/u', $text, $m) ? count($m[0]) : 0;
+    $minutes = (int) max(1, ceil($words / 200));
+    return ['words' => $words, 'minutes' => $minutes];
+}
+
+/**
+ * Построение оглавления (TOC) по заголовкам h2/h3 в контенте.
+ * Модифицирует контент «на лету» — добавляет id к заголовкам.
+ * Возвращает дерево: [['id','text','level','children'=>[...]]].
+ */
+function zezh_build_toc(&$content) {
+    $tree = [];
+
+    if (empty(trim($content))) return $tree;
+
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    libxml_use_internal_errors(true);
+    $dom->loadHTML('<?xml encoding="UTF-8"><div>' . $content . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+
+    $xpath   = new DOMXPath($dom);
+    $nodes   = $xpath->query('//h2 | //h3');
+    $used    = [];
+    $current = null;
+
+    foreach ($nodes as $node) {
+        $tag   = $node->tagName;
+        $level = (int) substr($tag, 1);
+        $text  = trim($node->textContent);
+
+        if (empty($text)) continue;
+
+        // Генерируем уникальный ID
+        $base = sanitize_title($text);
+        $id   = $base;
+        $suffix = 0;
+        while (isset($used[$id])) {
+            $suffix++;
+            $id = $base . '-' . $suffix;
+        }
+        $used[$id] = true;
+
+        // Добавляем id к элементу
+        $node->setAttribute('id', $id);
+
+        $entry = ['id' => $id, 'text' => $text, 'level' => $level, 'children' => []];
+
+        if ($level === 2) {
+            $tree[]  = $entry;
+            $current = &$tree[count($tree) - 1];
+        } elseif ($level === 3 && $current) {
+            $current['children'][] = $entry;
+        } elseif ($level === 3) {
+            // h3 без предшествующего h2 — добавляем на верхний уровень
+            $tree[] = $entry;
+        }
+    }
+
+    // Извлекаем HTML обратно
+    $wrapper = $dom->getElementsByTagName('div')->item(0);
+    $inner   = '';
+    foreach ($wrapper->childNodes as $child) {
+        $inner .= $dom->saveHTML($child);
+    }
+    $content = $inner;
+
+    return $tree;
+}
 
 add_filter('document_title_separator', fn()=> '·');
