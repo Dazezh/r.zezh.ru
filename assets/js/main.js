@@ -27,7 +27,7 @@
 
     const closeMenu = () => {
         body.classList.remove('menu-open');
-        body.style.top = '';
+        // body.style.top = ''; НЕ ВОЗВРАЩАТЬ, ЛОМАЕТСЯ ПРИ СКРОЛЛЕ ВВЕРХ, ЕСЛИ МЕНЮ БЫЛО ОТКРЫТО НА НИЖНЕЙ ЧАСТИ СТРАНИЦЫ
         window.scrollTo(0, menuScrollY);
         menuToggle?.setAttribute('aria-expanded', 'false');
         menuToggle?.setAttribute('aria-label', 'Открыть меню');
@@ -35,7 +35,7 @@
 
     const openMenu = () => {
         menuScrollY = window.scrollY;
-        body.style.top = -menuScrollY + 'px';
+        // body.style.top = -menuScrollY + 'px'; АНАЛОГИЧНО
         body.classList.add('menu-open');
         menuToggle?.setAttribute('aria-expanded', 'true');
         menuToggle?.setAttribute('aria-label', 'Закрыть меню');

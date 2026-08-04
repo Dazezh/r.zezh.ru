@@ -1,0 +1,238 @@
+/* ============================================================
+   ZEZH Lightbox — органичный просмотрщик изображений
+   Использует CSS-переменные темы сайта (светлая / тёмная)
+   ============================================================ */
+
+/* --- Overlay --- */
+.zezh-lb-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, .88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .35s ease, visibility .35s ease;
+    cursor: zoom-out;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+.zezh-lb-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- Toolbar (верхняя панель) --- */
+.zezh-lb-toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.zezh-lb-toolbar > * {
+    pointer-events: auto;
+}
+
+.zezh-lb-counter {
+    font: 500 13px/1 "IBM Plex Mono", monospace;
+    color: rgba(255, 255, 255, .72);
+    letter-spacing: .06em;
+}
+
+/* --- Кнопки --- */
+.zezh-lb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .08);
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    transition: background .2s, border-color .2s;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.zezh-lb-btn:hover {
+    background: rgba(255, 255, 255, .18);
+    border-color: rgba(255, 255, 255, .46);
+}
+
+.zezh-lb-btn:active {
+    background: rgba(255, 255, 255, .26);
+}
+
+/* --- Группа кнопок zoom --- */
+.zezh-lb-zoom-group {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.zezh-lb-zoom-group .zezh-lb-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.zezh-lb-zoom-label {
+    font: 500 12px/1 "IBM Plex Mono", monospace;
+    color: rgba(255, 255, 255, .62);
+    min-width: 42px;
+    text-align: center;
+}
+
+/* --- Кнопка закрытия --- */
+.zezh-lb-close {
+    font-size: 26px;
+    line-height: 0;
+    padding-bottom: 4px;
+}
+
+/* --- Контейнер изображения --- */
+.zezh-lb-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.zezh-lb-stage.is-grabbing {
+    cursor: grabbing;
+}
+
+.zezh-lb-stage.is-zoomed {
+    cursor: grab;
+}
+
+.zezh-lb-stage.is-fit {
+    cursor: zoom-out;
+}
+
+.zezh-lb-img-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .12s ease-out;
+    will-change: transform;
+}
+
+.zezh-lb-img-wrap.is-dragging {
+    transition: none;
+}
+
+.zezh-lb-img-wrap img {
+    display: block;
+    max-width: 92vw;
+    max-height: 88vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 4px 60px rgba(0, 0, 0, .45);
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* --- Спиннер загрузки --- */
+.zezh-lb-spinner {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255, 255, 255, .18);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: zezh-lb-spin .7s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes zezh-lb-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- Стрелки навигации --- */
+.zezh-lb-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+}
+
+.zezh-lb-arrow--prev { left: 20px; }
+.zezh-lb-arrow--next { right: 20px; }
+
+.zezh-lb-arrow .zezh-lb-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+}
+
+/* --- Скрываем стандартный курсор при зумах --- */
+.zezh-lb-overlay * {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   Адаптив
+   ============================================================ */
+@media (max-width: 768px) {
+    .zezh-lb-toolbar {
+        padding: 10px 12px;
+    }
+
+    .zezh-lb-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .zezh-lb-close {
+        font-size: 22px;
+    }
+
+    .zezh-lb-arrow--prev { left: 8px; }
+    .zezh-lb-arrow--next { right: 8px; }
+
+    .zezh-lb-arrow .zezh-lb-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .zezh-lb-zoom-label {
+        min-width: 34px;
+        font-size: 11px;
+    }
+
+    .zezh-lb-img-wrap img {
+        max-width: 96vw;
+        max-height: 82vh;
+        border-radius: 2px;
+    }
+
+    .zezh-lb-counter {
+        font-size: 11px;
+    }
+}

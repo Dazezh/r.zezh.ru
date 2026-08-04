@@ -5,7 +5,6 @@
     --muted: #68635f;
     --line: #d7d2ce;
     --accent: #af604c;
-    --accent2: #8b45ee;
     --header: rgba(240, 239, 237, .78);
     --shadow: 0 24px 70px rgba(38, 38, 38, .08)
 }
@@ -294,8 +293,7 @@ img {
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow)
+    border-color: var(--muted);
 }
 
 .card img {

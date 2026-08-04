@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-define('ZEZH_VERSION', '1.3.2');
+define('ZEZH_VERSION', '1.4.5');
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
@@ -16,6 +16,25 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('zezh-fonts', 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap', [], null);
     wp_enqueue_style('zezh-main', get_template_directory_uri().'/assets/css/main.css', [], ZEZH_VERSION);
     wp_enqueue_script('zezh-main', get_template_directory_uri().'/assets/js/main.js', [], ZEZH_VERSION, true);
+
+    // Лайтбокс — только на страницах записей, проектов и сервисов
+    if (is_singular(array('post', 'project', 'service'))) {
+        wp_enqueue_style('zezh-lightbox', get_template_directory_uri().'/assets/css/lightbox.css', [], ZEZH_VERSION);
+        wp_enqueue_script('zezh-lightbox', get_template_directory_uri().'/assets/js/lightbox.js', [], ZEZH_VERSION, true);
+    }
+
+    // Страница «Поговорим о стиле»
+    if (is_page_template('page-style.php')) {
+        wp_enqueue_style('zezh-style-page', get_template_directory_uri().'/assets/css/style-page.css', [], ZEZH_VERSION);
+
+        // Водяной знак — r-style логотип (меняется темой автоматически)
+        wp_add_inline_style('zezh-style-page',
+            ':root { --style-watermark: url('
+            . esc_url(get_template_directory_uri() . '/assets/img/r-style/r-dark.svg') . '); }'
+            . '[data-theme="dark"] { --style-watermark: url('
+            . esc_url(get_template_directory_uri() . '/assets/img/r-style/r-light.svg') . '); }'
+        );
+    }
 });
 
 add_action('init', function () {
@@ -210,5 +229,82 @@ function zezh_build_toc(&$content) {
 
     return $tree;
 }
+
+/**
+ * Оборачивает изображения в контенте в ссылки на полноразмерную версию
+ * для последующего открытия в лайтбоксе.
+ *
+ * Отрабатывает только на страницах записей, проектов и сервисов.
+ */
+add_filter('the_content', function ($content) {
+    if (!is_singular(array('post', 'project', 'service')) || empty(trim($content))) {
+        return $content;
+    }
+
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    libxml_use_internal_errors(true);
+    $dom->loadHTML(
+        '<?xml encoding="UTF-8"><div>' . $content . '</div>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+    );
+    libxml_clear_errors();
+
+    $xpath = new DOMXPath($dom);
+    $images = $xpath->query('//img');
+
+    foreach ($images as $img) {
+        $parent = $img->parentNode;
+
+        // Пропускаем изображения, уже обёрнутые в ссылку
+        if ($parent && $parent->nodeName === 'a') {
+            // Добавляем data-атрибут для лайтбокса на существующую ссылку
+            $parent->setAttribute('data-zezh-lightbox', '');
+            continue;
+        }
+
+        // Получаем ID вложения из класса wp-image-XXX
+        $class = $img->getAttribute('class') ?: '';
+        $attachment_id = 0;
+        if (preg_match('/wp-image-(\d+)/', $class, $m)) {
+            $attachment_id = (int) $m[1];
+        }
+
+        // Получаем URL полноразмерного изображения
+        $full_url = '';
+        if ($attachment_id) {
+            $full_info = wp_get_attachment_image_src($attachment_id, 'full');
+            if ($full_info) {
+                $full_url = $full_info[0];
+            }
+        }
+
+        // Если не удалось получить full — берём src
+        if (empty($full_url)) {
+            $full_url = $img->getAttribute('src');
+        }
+
+        if (empty($full_url)) {
+            continue;
+        }
+
+        // Создаём обёртку-ссылку
+        $a = $dom->createElement('a');
+        $a->setAttribute('href', $full_url);
+        $a->setAttribute('data-zezh-lightbox', '');
+
+        // Заменяем img на a > img
+        $img->parentNode->replaceChild($a, $img);
+        $a->appendChild($img);
+    }
+
+    // Извлекаем HTML обратно
+    $wrapper = $dom->getElementsByTagName('div')->item(0);
+    $inner = '';
+    foreach ($wrapper->childNodes as $child) {
+        $inner .= $dom->saveHTML($child);
+    }
+
+    return $inner;
+}, 20);
 
 add_filter('document_title_separator', fn()=> '·');
