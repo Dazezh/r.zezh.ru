@@ -46,10 +46,6 @@ body {
   overflow-x: clip;
 }
 
-h1, h2 {
-    word-break: break-word;
-}
-
 a {
     color: inherit;
     text-decoration: none
@@ -583,6 +579,10 @@ img {
 @media(max-width:800px) {
     html {
         overflow-x: hidden
+    }
+
+    h1, h2 {
+        word-break: break-word;
     }
 
     .shell {
