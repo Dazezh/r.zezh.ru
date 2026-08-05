@@ -1,3 +1,15 @@
+Copyright © 2026 Roman Balchonok.
+
+This document is part of the project's branding documentation.
+It is protected by copyright and is not covered by the GPL license.
+
+---
+
+Авторские права © 2026 Роман Бальчонок.
+
+Этот документ является частью документации по брендингу проекта.
+Он защищен авторским правом и не подпадает под действие лицензии GPL.
+
 # ZEZH Style Guide
 
 Техническое руководство по созданию страниц в едином стиле.  
