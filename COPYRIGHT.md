@@ -12,8 +12,8 @@ This repository contains materials distributed under different licenses.
 ## Source code
 
 All source code (including PHP, JavaScript, CSS and other program code) is
-licensed under the GNU General Public License v2.0 or any later version
-(GPL-2.0-or-later), unless explicitly stated otherwise.
+licensed under the GNU General Public License v3.0 or any later version
+(GPL-3.0-or-later), unless explicitly stated otherwise.
 
 A copy of the license is available in the LICENSE file.
 
@@ -49,8 +49,8 @@ to the project's branding or visual identity.
 ## Исходный код
 
 Весь исходный код (PHP, JavaScript, CSS и другие программные файлы)
-распространяется по лицензии GNU General Public License версии 2 или более
-поздней (GPL-2.0-or-later), если явно не указано иное.
+распространяется по лицензии GNU General Public License версии 3 или более
+поздней (GPL-3.0-or-later), если явно не указано иное.
 
 Полный текст лицензии находится в файле LICENSE.
 

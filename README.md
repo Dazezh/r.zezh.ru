@@ -88,9 +88,9 @@
 ## Branding & Licensing / Брендинг&Лицензия
 English
 
-* Licensing: Source code is licensed under GPL-2.0-or-later. Branding, logos, illustrations, mascots and other visual identity assets are protected by copyright and are not covered by the GPL. For more details, see the [COPYRIGHT.md](COPYRIGHT.md) file.
+* Licensing: Source code is licensed under GPL-3.0-or-later. Branding, logos, illustrations, mascots and other visual identity assets are protected by copyright and are not covered by the GPL. For more details, see the [COPYRIGHT.md](COPYRIGHT.md) file.
 
 ------------------------------
 Русский
 
-* Лицензирование: Исходный код распространяется по лицензии GPL-2.0-or-later. Брендинг, логотипы, иллюстрации, маскоты и другие элементы визуальной айдентики защищены авторским правом и не подпадают под действие GPL. Подробнее в файле [COPYRIGHT.md](COPYRIGHT.md).
+* Лицензирование: Исходный код распространяется по лицензии GPL-3.0-or-later. Брендинг, логотипы, иллюстрации, маскоты и другие элементы визуальной айдентики защищены авторским правом и не подпадают под действие GPL. Подробнее в файле [COPYRIGHT.md](COPYRIGHT.md).
