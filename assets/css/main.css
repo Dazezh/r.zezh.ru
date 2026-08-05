@@ -501,6 +501,12 @@ img {
     padding: 0
 }
 
+.footer-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
 .error-page {
     min-height: 70vh;
     padding: 120px 0

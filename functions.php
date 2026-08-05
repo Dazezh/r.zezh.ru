@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-define('ZEZH_VERSION', '1.4.5');
+define('ZEZH_VERSION', '1.4.6');
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
