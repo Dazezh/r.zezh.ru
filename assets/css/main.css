@@ -289,7 +289,6 @@ img {
     border: 1px solid var(--line);
     border-radius: 14px;
     overflow: hidden;
-    transition: .2s transform, .2s box-shadow
 }
 
 .card:hover {

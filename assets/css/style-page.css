@@ -28,14 +28,12 @@
     justify-content: center;
     margin: 50px 0 10px;
     opacity: .74;
-    transition: opacity .3s;
 }
 
 .style-hero-mark img {
     width: min(260px, 45vw);
     height: auto;
     display: block;
-    filter: drop-shadow(0 8px 32px rgba(0, 0, 0, .06));
 }
 
 .style-hero-mark .brand-light {
